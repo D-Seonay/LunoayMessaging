@@ -1,12 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page de messagerie</title>
+    <title>Messagerie en temps réel</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<h1>Page de messagerie</h1>
+<h1>Messagerie en temps réel</h1>
+
+<div id="messagerie">
+</div>
+
+<form id="messageForm">
+    <label for="contenu">Message:</label>
+    <input type="text" name="contenu" id="contenu" required>
+    <button type="submit">Envoyer</button>
+</form>
 <form action="/send" method="post">
 
     <label for="contenu">Contenu du message:</label>
@@ -15,11 +25,33 @@
     <input type="submit" value="Envoyer">
 </form>
 
-<h2>Messages:</h2>
-<ul>
-    <% messages.forEach(message => { %>
-    <li><strong><%= message.expediteur %>:</strong> <%= message.contenu %></li>
-    <% }); %>
-</ul>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); // Initialisez la connexion Socket.io
+
+    const messageContainer = document.getElementById('messageContainer');
+    const messageForm = document.getElementById('messageForm');
+    const contenuInput = document.getElementById('contenu');
+
+    // Écoutez les nouveaux messages en temps réel et ajoutez-les au conteneur
+    socket.on('message', (data) => {
+        const messageElement = document.createElement('div');
+        messageElement.textContent = data;
+        messageContainer.appendChild(messageElement);
+    });
+
+    // Envoyez un message au serveur en utilisant Socket.io
+    messageForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const contenu = contenuInput.value;
+
+        // Envoyez le message au serveur
+        socket.emit('message', contenu);
+
+        // Effacez le champ de saisie
+        contenuInput.value = '';
+    });
+</script>
+<script src="../js/app.js"></script>
 </body>
 </html>

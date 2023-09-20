@@ -1,15 +1,24 @@
-
 const axios = require('axios');
-document.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const username = document.querySelector('#username').value;
-    const password = document.querySelector('#password').value;
-    try {
-        const response = await axios.post('/register', { username, password });
-        alert(response.data);
-        // Redirigez l'utilisateur vers la page de connexion ou toute autre page appropriée
-    } catch (error) {
-        alert('Erreur lors de l\'inscription.');
-        console.error(error);
-    }
-});
+
+function afficherMessages() {
+    const messagerie = document.getElementById('messagerie');
+
+    // Effectuez une requête AJAX pour récupérer les messages depuis le serveur
+    axios.get('/messages')
+        .then((response) => {
+            const messages = response.data;
+
+            // Créez des éléments HTML pour chaque message et ajoutez-les à la section "messagerie"
+            messages.forEach((message) => {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = `${message.expediteur}: ${message.contenu}`;
+                messagerie.appendChild(messageElement);
+            });
+        })
+        .catch((error) => {
+            console.error('Erreur lors de la récupération des messages :', error);
+        });
+}
+
+// Appelez la fonction pour afficher les messages lorsque la page est chargée
+window.addEventListener('load', afficherMessages);

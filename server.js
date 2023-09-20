@@ -131,7 +131,34 @@ const server = http.createServer(async (req, res) => {
                     }
                 });
             });
-        } else {
+        }
+        else if (req.url === '/messages') {
+            let data = '';
+
+            req.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            const expediteur = userLog;
+            const {contenu} = querystring.parse(data);
+
+            db.query("INSERT INTO messages (expediteur, contenu) VALUES (?, ?)", [expediteur, contenu], (error, results) => {
+                console.log(expediteur)
+                console.log(contenu)
+
+                if (error) {
+                    console.log('Erreur lors de la récupération des messages :', error);
+                    res.writeHead(500);
+                    res.write(`{ error: 'Erreur lors de la récupération des messages' }`);
+                    res.end();
+                } else {
+                    res.writeHead(200);
+                    res.write(results);
+                    res.end();
+                }
+            })
+        }
+                else {
             res.writeHead(404);
             res.write('Page not found!');
             res.end();
@@ -144,6 +171,7 @@ io.on('connection', (socket) => {
     console.log('Nouvelle connexion :', socket.id);
 
     socket.on('message', (data) => {
+
         // Diffusez le message à tous les clients connectés
         io.emit('message', data);
     });
