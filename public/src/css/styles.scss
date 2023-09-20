@@ -1,0 +1,50 @@
+/* Global styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* BEM styles for the message app */
+.message-app {
+  &__header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 24px;
+  }
+
+  &__login-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  &__login-button:hover {
+    background-color: #0056b3;
+  }
+
+  &__main {
+    padding: 20px;
+    text-align: center;
+  }
+
+  &__recipient-label {
+    font-size: 18px;
+    margin-right: 10px;
+  }
+
+  &__recipient-dropdown {
+    font-size: 16px;
+    padding: 5px;
+  }
+}

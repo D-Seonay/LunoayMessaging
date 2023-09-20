@@ -18,11 +18,11 @@ const server = http.createServer((req, res) => {
 
     } else if (req.url === '/css/styles.css') {
 
-        serveStaticFile('./src/css/styles.css', 'text/css', res);
+        serveStaticFile('./public/src/css/styles.css', 'text/css', res);
 
     } else if (req.url === '/js/app.js') {
 
-        serveStaticFile('./src/js/app.js', 'text/javascript', res);
+        serveStaticFile('./public/src/js/app.js', 'text/javascript', res);
 
     }
     else {

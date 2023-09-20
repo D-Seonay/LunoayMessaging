@@ -5,7 +5,9 @@
     "socket.io": "^4.7.2"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "sass ./public/src/css/styles.scss ./public/src/css/styles.css",
+    "build:watch": "sass --watch ./public/src/css/styles.scss ./public/src/css/styles.css"
   },
   "name": "messagerienodejs",
   "version": "1.0.0",

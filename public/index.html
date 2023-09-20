@@ -1,15 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/styles.css">
+    <title>Messagerie</title>
 </head>
 <body>
-
-<H1><test>test</test></H1>
-
+<div class="message-app">
+    <header class="message-app__header">
+        <h1 class="message-app__title">Messagerie</h1>
+        <button class="message-app__login-button">Se connecter</button>
+    </header>
+    <main class="message-app__main">
+        <label for="recipient" class="message-app__recipient-label">Choisir un destinataire :</label>
+        <select id="recipient" class="message-app__recipient-dropdown">
+            <option value="user1">Utilisateur 1</option>
+            <option value="user2">Utilisateur 2</option>
+            <option value="user3">Utilisateur 3</option>
+        </select>
+    </main>
+</div>
 </body>
 </html>
