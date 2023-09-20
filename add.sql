@@ -4,5 +4,14 @@ USE dbMessagerie;
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE messages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  contenu TEXT,
+  expediteur INT,
+  date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (expediteur) REFERENCES users(id)
 );

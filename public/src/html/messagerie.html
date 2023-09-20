@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de messagerie</title>
+</head>
+<body>
+<h1>Page de messagerie</h1>
+<form action="/send" method="post">
+
+    <label for="contenu">Contenu du message:</label>
+    <textarea name="contenu" rows="4" cols="50" required></textarea><br><br>
+
+    <input type="submit" value="Envoyer">
+</form>
+
+<h2>Messages:</h2>
+<ul>
+    <% messages.forEach(message => { %>
+    <li><strong><%= message.expediteur %>:</strong> <%= message.contenu %></li>
+    <% }); %>
+</ul>
+</body>
+</html>
