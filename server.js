@@ -2,6 +2,18 @@ const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
 const { readFileSync } = require('fs');
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost/votre_base_de_donnees', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+}).then(() => {
+    console.log('Connecté à MongoDB');
+}).catch((err) => {
+    console.error('Erreur de connexion à MongoDB :', err);
+});
 function serveStaticFile(path, contentType, res) {
 
     const data = readFileSync(path, 'utf-8');
