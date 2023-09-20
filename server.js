@@ -1,12 +1,40 @@
 const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
+const { readFileSync } = require('fs');
+function serveStaticFile(path, contentType, res) {
+
+    const data = readFileSync(path, 'utf-8');
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.write(data);
+    res.end();
+}
+
 
 const server = http.createServer((req, res) => {
-    // Vous pouvez gérer ici les requêtes HTTP qui ne sont pas liées à WebSocket si nécessaire.
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Serveur WebSocket en cours d'exécution.\n');
-});
+    if (req.url === '/') {
+
+        serveStaticFile('./public/index.html', 'text/html', res);
+
+    } else if (req.url === '/css/styles.css') {
+
+        serveStaticFile('./src/css/styles.css', 'text/css', res);
+
+    } else if (req.url === '/js/app.js') {
+
+        serveStaticFile('./src/js/app.js', 'text/javascript', res);
+
+    }
+    else {
+
+        res.writeHead(404);
+        res.write('Page not found!');
+        res.end();
+
+    }
+
+
+})
 
 const io = socketIo(server);
 
@@ -23,7 +51,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4888;
 server.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
