@@ -92,7 +92,7 @@ const server = http.createServer(async (req, res) => {
                                     res.end();
                                 } else {
                                     userLog = user[0].id; // Stockez l'ID de l'utilisateur dans la variable userLog
-                                    serveStaticFile('./public/src/html/messagerie.html', 'text/html', res);
+                                    serveStaticFile('./public/src/html/test.html', 'text/html', res);
                                 }
                             });
                         } else {

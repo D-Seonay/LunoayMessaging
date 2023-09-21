@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messagerie en temps réel</title>
+  <style>
+    /* Styles CSS personnalisés */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    #message-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    #message-list li {
+      margin-bottom: 10px;
+      background-color: #f0f0f0;
+      padding: 10px;
+    }
+
+    #message-form {
+      margin-top: 20px;
+      display: flex;
+    }
+
+    #message-input {
+      flex: 1;
+      padding: 10px;
+    }
+
+    #send-button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Messagerie en temps réel</h1>
+  <ul id="message-list"></ul>
+  <div id="message-form">
+    <input type="text" id="message-input" placeholder="Écrivez un message">
+    <button id="send-button">Envoyer</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  // JavaScript pour la messagerie en temps réel
+  const socket = io();
+
+  const messageList = document.getElementById('message-list');
+  const messageInput = document.getElementById('message-input');
+  const sendButton = document.getElementById('send-button');
+
+  // Écouteur de clic sur le bouton "Envoyer"
+  sendButton.addEventListener('click', () => {
+    const message = messageInput.value;
+    if (message) {
+      // Envoyer le message au serveur
+      socket.emit('message', message);
+      messageInput.value = '';
+    }
+  });
+
+  // Écouteur d'événement pour la réception des messages
+  socket.on('message', (data) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = data;
+    messageList.appendChild(listItem);
+  });
+</script>
+</body>
+</html>

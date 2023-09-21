@@ -1,24 +1,49 @@
-const axios = require('axios');
+const cards = document.querySelectorAll('.card');
 
-function afficherMessages() {
-    const messagerie = document.getElementById('messagerie');
+/* View Controller
+-----------------------------------------*/
+const btns = document.querySelectorAll('.js-btn');
+btns.forEach((btn) => {
+    btn.addEventListener('click', on_btn_click, true);
+    btn.addEventListener('touch', on_btn_click, true);
+});
 
-    // Effectuez une requête AJAX pour récupérer les messages depuis le serveur
-    axios.get('/messages')
-        .then((response) => {
-            const messages = response.data;
-
-            // Créez des éléments HTML pour chaque message et ajoutez-les à la section "messagerie"
-            messages.forEach((message) => {
-                const messageElement = document.createElement('div');
-                messageElement.textContent = `${message.expediteur}: ${message.contenu}`;
-                messagerie.appendChild(messageElement);
-            });
-        })
-        .catch((error) => {
-            console.error('Erreur lors de la récupération des messages :', error);
-        });
+function on_btn_click (e) {
+    const nextID = e.currentTarget.getAttribute('data-target');
+    const next = document.getElementById(nextID);
+    if(!next) return;
+    bg_change(nextID);
+    view_change(next);
+    return false;
 }
 
-// Appelez la fonction pour afficher les messages lorsque la page est chargée
-window.addEventListener('load', afficherMessages);
+/* Add class to the body */
+function bg_change(next) {
+    document.body.className = '';
+    document.body.classList.add('is-'+next);
+}
+
+/* Add class to a card */
+function view_change(next) {
+    cards.forEach((card) => { card.classList.remove('is-show'); });
+    next.classList.add('is-show');
+}
+
+const registerContainer = document.getElementById('registerContainer');
+const loginContainer = document.getElementById('loginContainer');
+const registerButton = document.getElementById('registerButton');
+const loginButton = document.getElementById('loginButton');
+
+// Afficher le formulaire d'inscription et masquer le formulaire de connexion
+registerButton.addEventListener('click', () => {
+    registerContainer.style.display = 'block';
+    loginContainer.style.display = 'none';
+});
+
+// Afficher le formulaire de connexion et masquer le formulaire d'inscription
+loginButton.addEventListener('click', () => {
+    loginContainer.style.display = 'block';
+    registerContainer.style.display = 'none';
+});
+
+
