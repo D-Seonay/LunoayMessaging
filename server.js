@@ -12,6 +12,23 @@ function serveStaticFile(path, contentType, res) {
     res.write(data);
     res.end();
 }
+function idToUsername(userLog, callback) {
+    console.log("UserLog : " + userLog)
+    // Recherchez le nom d'utilisateur associé à l'identifiant d'expéditeur dans la base de données
+    db.query("SELECT username FROM users WHERE id = ?", [userLog], (error, results) => {
+        if (error) {
+            console.error('Erreur lors de la conversion de l\'identifiant en nom d\'utilisateur :', error);
+            callback(error, null);
+        } else if (results.length === 0) {
+            console.error('Aucun utilisateur trouvé pour cet identifiant.');
+            callback('Utilisateur non trouvé', null);
+        } else {
+            const username = results[0].username;
+            callback(null, username);
+        }
+    });
+}
+
 let userLog = '';
 
 const server = http.createServer(async (req, res) => {
@@ -62,8 +79,7 @@ const server = http.createServer(async (req, res) => {
 
             req.on('end', async () => {
                 const {loginUsername, loginPassword} = querystring.parse(data);
-                console.log(loginUsername);
-                console.log(loginPassword);
+                console.log("Login username : " + loginUsername + "Login password : " + loginPassword);
 
                 // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
                 db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
@@ -91,8 +107,8 @@ const server = http.createServer(async (req, res) => {
                                     res.write('Utilisateur non trouvé.');
                                     res.end();
                                 } else {
-                                    userLog = user[0].id; // Stockez l'ID de l'utilisateur dans la variable userLog
-                                    serveStaticFile('./public/src/html/test.html', 'text/html', res);
+                                    userLog = user[0].id;
+                                    serveStaticFile('./public/src/html/test.html' , 'text/html', res);
                                 }
                             });
                         } else {
@@ -119,8 +135,8 @@ const server = http.createServer(async (req, res) => {
                 db.query("INSERT INTO messages (expediteur, contenu) VALUES (?, ?)", [expediteur, contenu], async (error, send) => {
                     if (error) {
                         console.log(error)
-                        console.log(expediteur)
-                        console.log(contenu)
+                        console.log("Expediteur :" + expediteur)
+                        console.log("Contenu :" + contenu)
                         res.writeHead(500);
                         res.write('Erreur lors de l\'envoi du message.');
                         res.end();
@@ -165,15 +181,33 @@ const server = http.createServer(async (req, res) => {
         }
     }
 })
-        const io = socketIo(server);
 
+        const io = socketIo(server);
 io.on('connection', (socket) => {
     console.log('Nouvelle connexion :', socket.id);
 
-    socket.on('message', (data) => {
+    socket.on('login-success', (username) => {
+        // Stockez le nom d'utilisateur dans une variable locale pour cet utilisateur spécifique
+        socket.username = username;
+        console.log(`Utilisateur connecté : ${socket.username}`);
+    });
 
-        // Diffusez le message à tous les clients connectés
-        io.emit('message', data);
+    socket.on('message', (data) => {
+        const { text } = data;
+
+        // Utilisez la fonction idToUsername pour obtenir le nom d'utilisateur de l'émetteur
+        idToUsername(userLog, (error, emitter) => {
+            if (error) {
+                console.error(`Erreur lors de la récupération du nom d'utilisateur : ${error}`);
+                emitter = 'Utilisateur Inconnu';
+            }
+
+            console.log(`Message de ${emitter} : ${text}`);
+
+            // Diffusez le message à tous les clients connectés
+            io.emit('receive-message', { text, emitter });
+            io.emit('message', { emitter, text });
+        });
     });
 
     socket.on('disconnect', () => {
@@ -181,7 +215,10 @@ io.on('connection', (socket) => {
     });
 });
 
+
 const PORT = process.env.PORT || 4888;
 server.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
+
+

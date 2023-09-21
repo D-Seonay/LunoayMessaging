@@ -41,10 +41,23 @@
 
     #send-button {
       padding: 10px 20px;
-      background-color: #007BFF;
+      background-color: #8767F3;
       color: #fff;
       border: none;
       cursor: pointer;
+    }
+    /* Style pour les messages de l'utilisateur actuel */
+    .user-message {
+      text-align: right;
+      background-color: #8767F3;
+      color: #fff;
+    }
+
+    /* Style pour les messages des autres personnes */
+    .other-message {
+      text-align: left;
+      background-color: #f0f0f0;
+      color: #000;
     }
   </style>
 </head>
@@ -63,26 +76,42 @@
   // JavaScript pour la messagerie en temps réel
   const socket = io();
 
+
   const messageList = document.getElementById('message-list');
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
+
 
   // Écouteur de clic sur le bouton "Envoyer"
   sendButton.addEventListener('click', () => {
     const message = messageInput.value;
     if (message) {
-      // Envoyer le message au serveur
-      socket.emit('message', message);
+      // Envoyer le message au serveur avec l'information sur l'émetteur
+      socket.emit('message', { text: message, emitter: 'utilisateur_actuel' });
       messageInput.value = '';
     }
   });
 
+
   // Écouteur d'événement pour la réception des messages
   socket.on('message', (data) => {
     const listItem = document.createElement('li');
-    listItem.textContent = data;
+    listItem.textContent = data.emitter + " " + data.text;
+
+    // Ajoutez la classe appropriée en fonction de l'émetteur
+    if (data.emitter === 'utilisateur_actuel') {
+      listItem.classList.add('user-message');
+    } else {
+      listItem.classList.add('other-message');
+    }
+
     messageList.appendChild(listItem);
   });
+  // Écouteur de clic sur le bouton "Envoyer"
+
+
+
+
 </script>
 </body>
 </html>
