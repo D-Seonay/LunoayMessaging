@@ -26,49 +26,60 @@ async function registerUser(req, res, db) {
     });
 }
 
-async function loginUser(req, res, db, userLog) {
+async function loginUser(req, res, db) {
     let data = '';
 
     req.on('data', (chunk) => {
         data += chunk;
     });
 
-    req.on('end', async () => {
-        const { loginUsername, loginPassword } = querystring.parse(data);
-        console.log("Login username : " + loginUsername + "   Login password : " + loginPassword);
+    return new Promise((resolve, reject) => {
+        req.on('end', async () => {
+            const { loginUsername, loginPassword } = querystring.parse(data);
+            console.log("Login username : " + loginUsername + "   Login password : " + loginPassword);
 
-        // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
-        db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
-            if (error) {
-                errorMessage(500, 'Erreur lors de la connexion.', res);
-                console.error('Erreur lors de la connexion :', error);
-            } else if (users.length === 0) {
-                errorMessage(404, 'Utilisateur non trouvé.', res);
-            } else {
-                const user = users[0];
-                const isPasswordValid = await bcrypt.compare(loginPassword, user.password);
-                if (isPasswordValid) {
-                    db.query("SELECT id FROM users WHERE username = ?", [loginUsername], (error, user) => {
-                        if (error) {
-                            errorMessage(500, 'Erreur lors de la connexion.', res);
-                            console.error('Erreur lors de la connexion :', error);
-                        } else if (user.length === 0) {
-                            errorMessage(404, 'Utilisateur non trouvé.', res);
-                        } else {
-                            userLog = user[0].id;
-                            console.log("Userlog coter authentication : "+ userLog)
-                            module.exports = userLog ;
-                            serveStaticFile('./public/src/html/test.html', 'text/html', res);
-                        }
-                    });
+            // Déclarez userLog ici pour le garder dans la portée
+            let userLog;
+
+            // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
+            db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
+                if (error) {
+                    errorMessage(500, 'Erreur lors de la connexion.', res);
+                    console.error('Erreur lors de la connexion :', error);
+                    reject(error);
+                } else if (users.length === 0) {
+                    errorMessage(404, 'Utilisateur non trouvé.', res);
+                    resolve(null); // Résolvez avec null si l'utilisateur n'est pas trouvé
                 } else {
-                    errorMessage(401, 'Mot de passe incorrect.', res);
+                    const user = users[0];
+                    const isPasswordValid = await bcrypt.compare(loginPassword, user.password);
+                    if (isPasswordValid) {
+                        db.query("SELECT id FROM users WHERE username = ?", [loginUsername], (error, user) => {
+                            if (error) {
+                                errorMessage(500, 'Erreur lors de la connexion.', res);
+                                console.error('Erreur lors de la connexion :', error);
+                                reject(error);
+                            } else if (user.length === 0) {
+                                errorMessage(404, 'Utilisateur non trouvé.', res);
+                                resolve(null); // Résolvez avec null si l'utilisateur n'est pas trouvé
+                            } else {
+                                userLog = user[0].id;
+                                console.log("Userlog coter authentication : " + userLog);
+                                serveStaticFile('./public/src/html/test.html', 'text/html', res);
+                                resolve(userLog); // Résolvez avec userLog lorsque disponible
+                            }
+                        });
+                    } else {
+                        errorMessage(401, 'Mot de passe incorrect.', res);
+                        resolve(null); // Résolvez avec null si le mot de passe est incorrect
+                    }
                 }
-            }
+            });
         });
     });
-};
+}
 
 
 
 module.exports = {registerUser, loginUser };
+

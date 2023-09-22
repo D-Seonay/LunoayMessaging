@@ -1,4 +1,4 @@
-const userLog = require('../index.js')
+const {userLog} = require('../index')
 const { idToUsername } = require('../index');
 
 module.exports = (server, userLog) => {
