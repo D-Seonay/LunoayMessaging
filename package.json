@@ -7,15 +7,15 @@
     "socket.io": "^4.7.2"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node index.js",
     "build": "sass ./public/src/css/styles.scss ./public/src/css/styles.css",
     "build:watch": "sass --watch ./public/src/css/styles.scss ./public/src/css/styles.css"
   },
-  "name": "messagerienodejs",
+  "name": "lunoayMessaging",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "keywords": [],
-  "author": "",
+  "author": "D-Seonay",
   "license": "ISC",
-  "description": ""
+  "description": "Lunoay: Real-Time Messaging Node.js Project with socket.io. Focused on Node.js, this project is used for my learning and practice of Node.js, by developing a real-time messaging application."
 }

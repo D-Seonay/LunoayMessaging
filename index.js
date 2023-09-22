@@ -1,24 +1,14 @@
 const http = require('http');
 const socketIo = require('socket.io');
 const axios = require('axios');
-const { readFileSync } = require('fs');
 const bcrypt = require('bcrypt');
 const querystring = require('querystring');
+const { serveStaticFile, errorMessage } = require('./utils');
+const { loginUser, registerUser} = require('./authentication')
 const db = require('./database/authDatabase');
 
-function serveStaticFile(path, contentType, res) {
-    const data = readFileSync(path, 'utf-8');
-    res.writeHead(200, { 'Content-Type': contentType });
-    res.write(data);
-    res.end();
-}
-function errorMessage(head, content, res){
-    res.writeHead(head);
-    res.write(content);
-    res.end();
-}
 function idToUsername(userLog, callback) {
-    console.log("UserLog : " + userLog)
+    console.log("UserLog function idToUsername : " + userLog)
     // Recherchez le nom d'utilisateur associé à l'identifiant d'expéditeur dans la base de données
     db.query("SELECT username FROM users WHERE id = ?", [userLog], (error, results) => {
         if (error) {
@@ -33,8 +23,10 @@ function idToUsername(userLog, callback) {
         }
     });
 }
+module.exports.idToUsername = idToUsername;
 
-let userLog = '';
+
+let userLog;
 
 const server = http.createServer(async (req, res) => {
     if (req.method === 'GET') {
@@ -49,75 +41,15 @@ const server = http.createServer(async (req, res) => {
             res.write('Page not found!');
             res.end();
         }
-    } else if (req.method === 'POST') {
+    }
+    else if (req.method === 'POST') {
         if (req.url === '/register') {
-            let data = '';
-
-            req.on('data', (chunk) => {
-                data += chunk;
-            });
-
-            req.on('end', async () => {
-                const {username, email, password} = querystring.parse(data);
-                const hashedPassword = await bcrypt.hash(password, 10);
-
-                // Insérez l'utilisateur dans la base de données
-                db.query('INSERT INTO users (username, email ,password) VALUES (?, ?, ?)', [ username, email, hashedPassword], (error, results) => {
-                    if (error) {
-                        errorMessage(500,'Erreur lors de la connexion.', res)
-                        console.error('Erreur lors de l\'inscription :', error);
-                    } else {
-                        errorMessage(200, 'Message envoyé avec succès.', res)
-
-                    }
-                });
-            });
-        } else if (req.url === '/login') {
-            let data = '';
-
-            req.on('data', (chunk) => {
-                data += chunk;
-            });
-
-            req.on('end', async () => {
-                const {loginUsername, loginPassword} = querystring.parse(data);
-                console.log("Login username : " + loginUsername + "   Login password : " + loginPassword);
-
-                // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
-                db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
-                    if (error) {
-                        errorMessage(500, 'Erreur lors de la connexion.', res)
-
-                        console.error('Erreur lors de la connexion :', error);
-
-                    } else if (users.length === 0) {
-                        errorMessage(404,'Utilisateur non trouvé.', res)
-
-                    } else {
-                        const user = users[0];
-                        const isPasswordValid = await bcrypt.compare(loginPassword, user.password);
-                        if (isPasswordValid) {
-                            db.query("SELECT id FROM users WHERE username = ?", [loginUsername], (error, user) => {
-                                if (error) {
-                                    errorMessage(500, 'Erreur lors de la connexion.', res)
-                                    console.error('Erreur lors de la connexion :', error);
-
-                                } else if (user.length === 0) {
-                                    errorMessage(404,'Utilisateur non trouvé.', res)
-
-                                } else {
-                                    userLog = user[0].id;
-                                    serveStaticFile('./public/src/html/test.html' , 'text/html', res);
-                                }
-                            });
-                        } else {
-                            errorMessage(401,'Mot de passe incorrect.', res)
-
-                        }
-                    }
-                });
-            });
-        } else if (req.url === '/send') {
+            registerUser(req, res, db);
+        }
+        else if (req.url === '/login') {
+            loginUser(req, res, db, userLog);
+        }
+        else if (req.url === '/send') {
 
             let data = '';
 
@@ -176,6 +108,9 @@ const server = http.createServer(async (req, res) => {
     }
 })
 
+const configureSocketIo = require('./sockets/socketIo');
+configureSocketIo(server);
+/*
         const io = socketIo(server);
 io.on('connection', (socket) => {
     console.log('Nouvelle connexion :', socket.id);
@@ -209,7 +144,7 @@ io.on('connection', (socket) => {
         console.log('Déconnexion :', socket.id);
     });
 });
-
+*/
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
