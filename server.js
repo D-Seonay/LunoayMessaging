@@ -64,14 +64,11 @@ const server = http.createServer(async (req, res) => {
                 // Insérez l'utilisateur dans la base de données
                 db.query('INSERT INTO users (username, email ,password) VALUES (?, ?, ?)', [ username, email, hashedPassword], (error, results) => {
                     if (error) {
+                        errorMessage(500,'Erreur lors de la connexion.', res)
                         console.error('Erreur lors de l\'inscription :', error);
-                        res.writeHead(500);
-                        res.write('Erreur lors de la connexion.');
-                        res.end();
                     } else {
-                        res.writeHead(200);
-                        res.write('Inscription réussie.');
-                        res.end();
+                        errorMessage(200, 'Message envoyé avec succès.', res)
+
                     }
                 });
             });
@@ -89,37 +86,33 @@ const server = http.createServer(async (req, res) => {
                 // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
                 db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
                     if (error) {
+                        errorMessage(500, 'Erreur lors de la connexion.', res)
+
                         console.error('Erreur lors de la connexion :', error);
-                        res.writeHead(500);
-                        res.write('Erreur lors de la connexion.');
-                        res.end();
+
                     } else if (users.length === 0) {
-                        res.writeHead(404);
-                        res.write('Utilisateur non trouvé.');
-                        res.end();
+                        errorMessage(404,'Utilisateur non trouvé.', res)
+
                     } else {
                         const user = users[0];
                         const isPasswordValid = await bcrypt.compare(loginPassword, user.password);
                         if (isPasswordValid) {
                             db.query("SELECT id FROM users WHERE username = ?", [loginUsername], (error, user) => {
                                 if (error) {
+                                    errorMessage(500, 'Erreur lors de la connexion.', res)
                                     console.error('Erreur lors de la connexion :', error);
-                                    res.writeHead(500);
-                                    res.write('Erreur lors de la connexion.');
-                                    res.end();
+
                                 } else if (user.length === 0) {
-                                    res.writeHead(404);
-                                    res.write('Utilisateur non trouvé.');
-                                    res.end();
+                                    errorMessage(404,'Utilisateur non trouvé.', res)
+
                                 } else {
                                     userLog = user[0].id;
                                     serveStaticFile('./public/src/html/test.html' , 'text/html', res);
                                 }
                             });
                         } else {
-                            res.writeHead(401);
-                            res.write('Mot de passe incorrect.');
-                            res.end();
+                            errorMessage(401,'Mot de passe incorrect.', res)
+
                         }
                     }
                 });
@@ -142,13 +135,12 @@ const server = http.createServer(async (req, res) => {
                         console.log(error)
                         console.log("Expediteur :" + expediteur)
                         console.log("Contenu :" + contenu)
-                        res.writeHead(500);
-                        res.write('Erreur lors de l\'envoi du message.');
-                        res.end();
+
+                        errorMessage(500, 'Erreur lors de la connexion.', res)
+
                     } else {
-                        res.writeHead(200);
-                        res.write('Message envoyé avec succès.');
-                        res.end();
+                        errorMessage(200, 'Message envoyé avec succès.', res)
+
                     }
                 });
             });
@@ -169,20 +161,17 @@ const server = http.createServer(async (req, res) => {
 
                 if (error) {
                     console.log('Erreur lors de la récupération des messages :', error);
-                    res.writeHead(500);
-                    res.write(`{ error: 'Erreur lors de la récupération des messages' }`);
-                    res.end();
+                    errorMessage(500, { error: 'Erreur lors de la récupération des messages' }, res)
+
                 } else {
-                    res.writeHead(200);
-                    res.write(results);
-                    res.end();
+                    errorMessage(200, results, res)
+
                 }
             })
         }
                 else {
-            res.writeHead(404);
-            res.write('Page not found!');
-            res.end();
+            errorMessage(404,'Page not found!', res)
+
         }
     }
 })
@@ -221,7 +210,7 @@ io.on('connection', (socket) => {
 });
 
 
-const PORT = process.env.PORT || 4888;
+const PORT = process.env.PORT;
 server.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
 });
