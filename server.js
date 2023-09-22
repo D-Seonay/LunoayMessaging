@@ -12,6 +12,11 @@ function serveStaticFile(path, contentType, res) {
     res.write(data);
     res.end();
 }
+function errorMessage(head, content, res){
+    res.writeHead(head);
+    res.write(content);
+    res.end();
+}
 function idToUsername(userLog, callback) {
     console.log("UserLog : " + userLog)
     // Recherchez le nom d'utilisateur associé à l'identifiant d'expéditeur dans la base de données
@@ -79,7 +84,7 @@ const server = http.createServer(async (req, res) => {
 
             req.on('end', async () => {
                 const {loginUsername, loginPassword} = querystring.parse(data);
-                console.log("Login username : " + loginUsername + "Login password : " + loginPassword);
+                console.log("Login username : " + loginUsername + "   Login password : " + loginPassword);
 
                 // Recherchez l'utilisateur dans la base de données par le nom d'utilisateur
                 db.query("SELECT * FROM users WHERE username = ?", [loginUsername], async (error, users) => {
@@ -205,7 +210,7 @@ io.on('connection', (socket) => {
             console.log(`Message de ${emitter} : ${text}`);
 
             // Diffusez le message à tous les clients connectés
-            io.emit('receive-message', { text, emitter });
+            io.emit('receive-message', { emitter ,text });
             io.emit('message', { emitter, text });
         });
     });

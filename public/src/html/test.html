@@ -96,12 +96,15 @@
   // Écouteur d'événement pour la réception des messages
   socket.on('message', (data) => {
     const listItem = document.createElement('li');
-    listItem.textContent = data.emitter + " " + data.text;
+    listItem.textContent = data.emitter + "  |  " + data.text;
 
     // Ajoutez la classe appropriée en fonction de l'émetteur
-    if (data.emitter === 'utilisateur_actuel') {
+    if (data.emitter === socket.username) {
+
       listItem.classList.add('user-message');
     } else {
+      console.log(data.emitter)
+      console.log(data)
       listItem.classList.add('other-message');
     }
 
