@@ -4,7 +4,7 @@ const axios = require('axios');
 const { readFileSync } = require('fs');
 const bcrypt = require('bcrypt');
 const querystring = require('querystring');
-const db = require('./db');
+const db = require('./database/authDatabase');
 
 function serveStaticFile(path, contentType, res) {
     const data = readFileSync(path, 'utf-8');
@@ -197,6 +197,7 @@ io.on('connection', (socket) => {
             }
 
             console.log(`Message de ${emitter} : ${text}`);
+
 
             // Diffusez le message à tous les clients connectés
             io.emit('receive-message', { emitter ,text });
