@@ -64,6 +64,7 @@ async function loginUser(req, res, db) {
                                 resolve(null); // Résolvez avec null si l'utilisateur n'est pas trouvé
                             } else {
                                 userLog = user[0].id;
+                                module.exports = userLog;
                                 console.log("Userlog coter authentication : " + userLog);
                                 serveStaticFile('./public/src/html/test.html', 'text/html', res);
                                 resolve(userLog); // Résolvez avec userLog lorsque disponible

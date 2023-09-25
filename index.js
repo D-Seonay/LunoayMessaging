@@ -1,7 +1,4 @@
 const http = require('http');
-const socketIo = require('socket.io');
-const axios = require('axios');
-const bcrypt = require('bcrypt');
 const querystring = require('querystring');
 const { serveStaticFile, errorMessage } = require('./utils');
 const { loginUser, registerUser} = require('./authentication')

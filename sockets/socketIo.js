@@ -1,4 +1,4 @@
-const {userLog} = require('../index')
+const userLog = require('../index')
 const { idToUsername } = require('../index');
 
 module.exports = (server, userLog) => {
@@ -7,12 +7,12 @@ module.exports = (server, userLog) => {
 
     io.on('connection', (socket) => {
         console.log('Nouvelle connexion :', socket.id);
-        console.log("Connection utilisateur : " + userLog)
+        console.log("Connection utilisateur : " + socket.username)
 
 
-        socket.on('login-success', (username) => {
+        socket.on('login-success', (userLog) => {
             // Stockez le nom d'utilisateur dans une variable locale pour cet utilisateur spécifique
-            socket.username = username;
+            socket.username = userLog;
             console.log(`Utilisateur connecté : ${socket.username}`);
         });
 
