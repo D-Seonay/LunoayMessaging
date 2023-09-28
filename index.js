@@ -45,13 +45,10 @@ const server = http.createServer(async (req, res) => {
         else if (req.url === '/login') {
             loginUser(req, res, db)
                 .then((userLog) => {
-                    // Utilisez userLog ici ou passez-le à d'autres fonctions ou fichiers si nécessaire
-                    console.log("userLog récupéré dans le fichier principal : " + userLog);
-                    module.exports = userLog;
+                    console.log("UserLog récupéré : " + userLog);
                 })
                 .catch((error) => {
-                    // Gérez les erreurs ici si nécessaire
-                    console.error('Erreur lors de la connexion :', error);
+                    console.error("Erreur lors de la connexion : " + error);
                 });
         }
         else if (req.url === '/send') {
